@@ -32,7 +32,7 @@ services:
     ports:
       - 3000:3000
 ```
-The compose file defines a stack with two services `prometheus` and `grafana`.
+The compose file defines a stack with three services `prometheus`, `node-exporter` and `grafana`.
 When deploying the stack, docker compose maps port the default ports for each service to the equivalent ports on the host in order to inspect easier the web interface of each service.
 Make sure the ports 9090 and 3000 on the host are not already in use.
 
@@ -40,13 +40,10 @@ Make sure the ports 9090 and 3000 on the host are not already in use.
 
 ```
 $ docker compose up -d
-Creating network "prometheus-grafana_default" with the default driver
-Creating volume "prometheus-grafana_prom_data" with default driver
-...
-Creating grafana    ... done
-Creating prometheus ... done
-Attaching to prometheus, grafana
-
+[+] Running 3/3
+ ✔ Container node-exporter  Started                                                                                                                                                                    0.0s
+ ✔ Container prometheus     Started                                                                                                                                                                    0.0s
+ ✔ Container grafana        Started
 ```
 
 ## Expected result
@@ -54,9 +51,11 @@ Attaching to prometheus, grafana
 Listing containers must show two containers running and the port mapping as below:
 ```
 $ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-dbdec637814f        prom/prometheus     "/bin/prometheus --c…"   8 minutes ago       Up 8 minutes        0.0.0.0:9090->9090/tcp   prometheus
-79f667cb7dc2        grafana/grafana     "/run.sh"                8 minutes ago       Up 8 minutes        0.0.0.0:3000->3000/tcp   grafana
+CONTAINER ID   IMAGE                       COMMAND                  CREATED       STATUS          PORTS                    NAMES
+b7d23860a102   prom/node-exporter:latest   "/bin/node_exporter …"   2 hours ago   Up 26 seconds   9100/tcp                 node-exporter
+0caedc99d84d   prom/prometheus             "/bin/prometheus --c…"   2 hours ago   Up 26 seconds   0.0.0.0:9090->9090/tcp   prometheus
+ff73c2b18acb   grafana/grafana             "/run.sh"                2 hours ago   Up 26 seconds   0.0.0.0:3000->3000/tcp   grafana
+chaitali@FVFDVK2UQ05F test %
 ```
 
 Navigate to `http://localhost:3000` in your web browser and use the login credentials specified in the compose file to access Grafana. It is already configured with prometheus as the default datasource.
